@@ -1,9 +1,16 @@
-name: Test_Code 
-on: workflow_dispatch
+name: Run tmate on runner
+
+on: [push, pull_request]
+
 jobs:
-  build:
+  tmate:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v2
+      - name: Install tmate
+        run: sudo apt-get install tmate -y
+      - name: Run tmate
+        run: tmate -S /tmp/tmate.sock new-session -d
+      - name: Print tmate SSH connection string
+        run: echo "tmate -S /tmp/tmate.sock ssh \$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')"
+      - name: Wait for tmate to start
+        run: sleep 10
