@@ -1,10 +1,10 @@
 name: Start persistent tmate session on runner
 
-on: [push, pull_request]
+on: workflow_dispatch
 
 jobs:
   tmate:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Install tmate
         run: sudo apt-get install tmate -y
