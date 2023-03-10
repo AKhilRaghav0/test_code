@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   tmate:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Install tmate
         run: sudo apt-get install tmate -y
