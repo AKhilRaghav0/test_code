@@ -1,16 +1,24 @@
-name: Run tmate on runner
+name: Start persistent tmate session on runner
 
 on: [push, pull_request]
 
 jobs:
   tmate:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Install tmate
         run: sudo apt-get install tmate -y
-      - name: Run tmate
+      - name: Start tmate
         run: tmate -S /tmp/tmate.sock new-session -d
       - name: Print tmate SSH connection string
-        run: echo "tmate -S /tmp/tmate.sock ssh \$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')"
-      - name: Wait for tmate to start
-        run: sleep 10
+        run: echo "::set-output name=tmate_ssh::tmate -S /tmp/tmate.sock ssh \$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')"
+        id: ssh
+      - name: Print tmate web URL
+        run: echo "::set-output name=tmate_url::\$(tmate -S /tmp/tmate.sock display -p '#{tmate_web}')"
+        id: url
+      - name: Keep workflow running
+        run: sleep infinity
+        if: always()
+    outputs:
+      tmate_ssh: ${{ steps.ssh.outputs.tmate_ssh }}
+      tmate_url: ${{ steps.url.outputs.tmate_url }}
