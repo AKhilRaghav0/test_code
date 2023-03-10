@@ -4,21 +4,23 @@ on: [push, pull_request]
 
 jobs:
   tmate:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Install tmate
         run: sudo apt-get install tmate -y
       - name: Start tmate
         run: tmate -S /tmp/tmate.sock new-session -d
-      - name: Print tmate SSH connection string
-        run: echo "::set-output name=tmate_ssh::tmate -S /tmp/tmate.sock ssh \$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')"
+      - name: Set tmate SSH connection string
         id: ssh
-      - name: Print tmate web URL
-        run: echo "::set-output name=tmate_url::\$(tmate -S /tmp/tmate.sock display -p '#{tmate_web}')"
+        run: |
+          echo "TMATE_SSH=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}')" >> $GITHUB_ENV
+      - name: Set tmate web URL
         id: url
+        run: |
+          echo "TMATE_URL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_web}')" >> $GITHUB_ENV
       - name: Keep workflow running
         run: sleep infinity
         if: always()
-    outputs:
-      tmate_ssh: ${{ steps.ssh.outputs.tmate_ssh }}
-      tmate_url: ${{ steps.url.outputs.tmate_url }}
+    env:
+      TMATE_SSH: ${{ steps.ssh.outputs.TMATE_SSH }}
+      TMATE_URL: ${{ steps.url.outputs.TMATE_URL }}
